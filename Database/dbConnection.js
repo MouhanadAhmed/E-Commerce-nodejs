@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 
 
-export function dbConnection() {
-    mongoose.connect('mongodb+srv://mouhanadahmed2:va44ws167MraIjD6@mymongodb.l1ihnxo.mongodb.net/E-commerce').then(()=>{
-        console.log("db connected");
-    }).catch((err)=>{
-        console.log(`db Error ${err}`);
-    })
+export default function dbConnection() {
+    mongoose
+    .connect(process.env.DB_CONNECTION)
+    .then((conn) => console.log(`Database connected on ${process.env.DB_CONNECTION}`))
+    .catch((err) => console.log(` Database Error ${err}`));
 }

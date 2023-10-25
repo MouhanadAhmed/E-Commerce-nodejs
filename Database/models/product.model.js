@@ -6,7 +6,7 @@ const productSchema = new Schema({
         unique:[true,'product name is not available'],
         required:[true,'product name is required' ],
         trim:true,
-        minlength: [10, 'too short product name']
+        minlength: [2, 'too short product name']
     },
     slug:{
         type:String,
@@ -15,20 +15,18 @@ const productSchema = new Schema({
     },
     price:{
         type:Number,
-        default:0,
         min:0,
         required:[true, 'product price is required']
     },
     priceAfterDiscount:{
         type:Number,
-        // default:0,
         min:0,
     },
     description:{
         type:String,
         trim:true,
-        maxlenght: [100, 'description should be less than or equal 100 charcters'],
-        minlength: [10, 'too short product description'],
+        maxlenght: [300, 'too long product description'],
+        minlength: [5, 'too short product description'],
         required:[true,'product description is required']
     },
     quantity:{
@@ -43,13 +41,8 @@ const productSchema = new Schema({
         default:0,
         min:0,
     },
-    imgCover:{
-        type:String,
-        // required:true
-    },
-    images:{
-        type:[String]
-    },
+    imgCover:String,
+    images:[String],
     category:{
         type:Types.ObjectId,
         ref:'category',
@@ -78,7 +71,22 @@ const productSchema = new Schema({
 
     }
 },{
-    timestamps:true
+    timestamps: true, 
+    toJSON: { virtuals: true }, 
+    toObject: { virtuals: true }
 })
 
+productSchema.post("init", (doc) => {
+    doc.imgCover = process.env.BASE_URL + "product/" + doc.imgCover;
+    if (doc.images) doc.images = doc.images.map((path) => process.env.BASE_URL + "product/" + path);
+  }); 
+  
+//   productSchema.virtual("myReview", {
+//     ref: "review",
+//     localField: "_id",
+//     foreignField: "product"
+//   });
+//   productSchema.pre(/^find/, function () {
+//     this.populate("myReview");
+// })
 export const productModel = model('product',productSchema)

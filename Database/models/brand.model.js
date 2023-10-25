@@ -19,5 +19,7 @@ const brandSchema = new Schema({
 },{
     timestamps:true
 })
-
+brandSchema.post("init", (doc) => {
+    doc.logo = process.env.BASE_URL + "brand/" + doc.logo;
+  }); 
 export const brandModel = model('brand',brandSchema)

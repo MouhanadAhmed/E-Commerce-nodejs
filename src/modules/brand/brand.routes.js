@@ -1,15 +1,17 @@
 
 import express from 'express';
 import * as brandControllers from './brand.controller.js';
+import { validation } from '../../utils/middleware/validation.js';
+import { createBrandSchema, deleteBrandSchema, getBrandByIdSchema, updateBrandSchema } from './brand.validator.js';
 const brandRouter =  express.Router();
 
 brandRouter.route('/')
-        .post(brandControllers.addBrand)
+        .post(validation(createBrandSchema),brandControllers.addBrand)
         .get(brandControllers.getAllBrands)
 
 
 brandRouter.route('/:id')
-        .get(brandControllers.getBrandById)
-        .put(brandControllers.updateBrand)
-        .delete(brandControllers.deleteBrand)
+        .get(validation(getBrandByIdSchema),brandControllers.getBrandById)
+        .put(validation(updateBrandSchema),brandControllers.updateBrand)
+        .delete(validation(deleteBrandSchema),brandControllers.deleteBrand)
 export default brandRouter;

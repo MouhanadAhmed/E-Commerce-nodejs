@@ -2,24 +2,20 @@ import { Schema, Types, model } from "mongoose";
 
 const couponSchema = new Schema({
     code:{
-        type:string,
-        required:true,
+        type:String,
+        required: [true, 'coupon code required'],
         trim:true,
+        unique: true
     },
-    expiresAt:{
-        type:Date,
-        required:true
+    discount: {
+        type: Number,
+        min: 0,
+        required: [true, 'coupon discount required'],
+
     },
-    discount:{
-        type:Number,
-        required:true,
-        min:0,
-    
-    },
-    rate:{
-        type:Number,
-        enum:[1,2,3,4,5],
-        required:true
+    expires: {
+        type: String,
+        required: [true, 'coupon date required'],
     }
 },{
     timestamps:true

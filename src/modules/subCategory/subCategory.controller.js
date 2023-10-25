@@ -1,5 +1,5 @@
 import {subCategoryModel} from '../../../Database/models/subCategory.model.js';
-import { deleteOne, addOne, getAll, updateOne, getById } from '../handlers/factor.js';
+import { deleteOne, addOne, getAll, updateOne, getById } from '../../utils/handlers/refactor.handler.js';
 
 
 /**

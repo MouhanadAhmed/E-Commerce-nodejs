@@ -6,11 +6,12 @@ const categorySchema = new Schema({
         unique:[true,'name is required'],
         required:true,
         trim:true,
-        minlength:[3, ' too short category name'],
+        minlength:[2, ' too short category name'],
     },
     slug:{
         type:String,
-        lowercase:true
+        lowercase:true,
+        required: true
     },
     image:{
         type:String,
@@ -19,8 +20,8 @@ const categorySchema = new Schema({
 },{
     timestamps:true
 })
-// categorySchema.post('init', function(doc){
-//     doc.image= process.env.BASE_URL +'category/'+ doc.image
-//     console.log(doc)
-// })
+categorySchema.post('init', function(doc){
+    doc.image= process.env.BASE_URL +'category/'+ doc.image
+    // console.log(doc)
+})
 export const categoryModel = model('category',categorySchema)

@@ -1,28 +1,32 @@
 import { Schema, Types, model } from "mongoose";
 
 const reviewSchema = new Schema({
-    text:{
-        type:string,
-        required:true,
-        trim:true,
+    comment: {
+        type: String,
+        trim: true,
+        required: [true, 'review comment required']
+
     },
-    product:{
+    product: {
         type:Types.ObjectId,
-        ref:'product',
-        required:true
+        ref: "product"
     },
-    user:{
-        type:Types.ObjectId,
-        ref:'user',
-        required:true
+    user: {
+        type: Types.ObjectId,
+        ref: "user"
+
     },
-    rate:{
-        type:Number,
-        enum:[1,2,3,4,5],
-        required:true
+    rating: {
+        type: Number,
+        min: 1,
+        max:5
     }
 },{
     timestamps:true
+})
+
+reviewSchema.pre(/^find/, function () {
+    this.populate('user','name');
 })
 
 export const reviewModel = model('review',reviewSchema)

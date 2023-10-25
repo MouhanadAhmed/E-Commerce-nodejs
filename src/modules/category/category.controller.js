@@ -1,5 +1,5 @@
 import {categoryModel} from '../../../Database/models/category.model.js';
-import { deleteOne, addOne, getAll, updateOne, getById  } from '../handlers/factor.js';
+import { deleteOne, addOne, getAll, updateOne, getById  } from '../../utils/handlers/refactor.handler.js';
 
 /**
  * *This is Add Category Controller, 

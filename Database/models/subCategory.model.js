@@ -16,10 +16,6 @@ const subCategorySchema = new Schema({
         type:Types.ObjectId,
         ref:'category',
         required:true
-    },
-    image:{
-        type:String,
-        // required:true
     }
 },{
     timestamps:true
