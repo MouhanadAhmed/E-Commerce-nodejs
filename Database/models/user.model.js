@@ -34,8 +34,9 @@ const userSchema = new Schema({
     changePasswordAt:Date,
     isActive:{
         type:Boolean,
-        default:true
+        default:false
     },
+    loggedOutAt:Date,
     wishList: [{
         type: Types.ObjectId,
         ref:'product'

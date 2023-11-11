@@ -4,7 +4,7 @@ import Joi from "joi";
 export const createProductSchema = Joi.object({
     name:Joi.string().min(2).max(30).required(),
     price:Joi.number().min(0).required(),
-    priceAfterDiscount:Joi.number().min(0).required(),
+    priceAfterDiscount:Joi.number().min(0).optional(),
     description:Joi.string().min(10).max(100).required(),
     quantity:Joi.number().min(0).required(),
     sold:Joi.number().min(0).optional(),

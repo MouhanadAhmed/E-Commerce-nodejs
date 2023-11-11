@@ -3,7 +3,9 @@ import { catchAsyncError } from "../middleware/catchAsyncError.js";
 import slugify from "slugify";
 import cloudinary from "../cloudinary.js";
 import ApiFeatures from "../APIFeatures.js";
-
+import bcrypt from 'bcrypt';
+import { sendEmail } from "../../email/sendEmail.js";
+import jwt from 'jsonwebtoken'
 export const deleteOne=(model,result)=>{
     return catchAsyncError(async (req,res,next) => {
         const {id}= req.params;
@@ -25,7 +27,9 @@ export const addOne=(model,results) =>{
                 }else if (results === "User"){
                     let user = await model.findOne({email:req.body.email});
                     console.log(user);
-                    if(user) return next(new AppError("duplicate email",409));
+                    // req.body.password = await bcrypt.hash(req.body.password,7)
+                    if(user) return next(new AppError("Email already exists",409));
+
                 }else{
 
                     req.body.image= req.file.filename;
@@ -36,6 +40,10 @@ export const addOne=(model,results) =>{
                 await document.save();
                 let response= {}
                 response[results] = document;
+                if(results === "User") {
+                    let verifyToken = jwt.sign({id:document._id },process.env.VERIFY_SECRET)
+                    sendEmail({email:req.body.email,api:`http://localhost:3000/api/v1/auth/verify/${verifyToken}`,sub:"Verify Email"})
+                }
                 res.status(201).json({message:"Success", ...response});
 
         // // req.body.image = req.file.filename

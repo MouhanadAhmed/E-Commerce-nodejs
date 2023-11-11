@@ -5,11 +5,15 @@ const productRouter =  express.Router();
 import { uploadMixFiles } from '../../utils/middleware/fileUploads.js';
 import {validation} from '../../utils/middleware/validation.js';
 import { createProductSchema, deleteProductSchema, getProductByIdSchema, updateProductSchema } from './product.validator.js';
+import { allowTo, protectedRoutes } from '../auth/auth.controller.js';
 
 
 
 productRouter.route('/')
-        .post(uploadMixFiles("product",[{name:"imgCover",maxCount:1},{name:"images",maxCount:8}]),validation(createProductSchema),productControllers.addProduct)
+        .post(
+                protectedRoutes,
+                allowTo("admin","user"),
+                uploadMixFiles("product",[{name:"imgCover",maxCount:1},{name:"images",maxCount:8}]),validation(createProductSchema),productControllers.addProduct)
         .get(productControllers.getAllProducts)
 
 
