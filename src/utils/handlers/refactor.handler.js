@@ -22,6 +22,10 @@ export const addOne=(model,results) =>{
                 if (results === 'Product') {
                     req.body.imgCover = req.files.imgCover[0].filename;
                     req.body.images = req.files.images.map(ele => ele.filename)
+                }else if (results === "User"){
+                    let user = await model.findOne({email:req.body.email});
+                    console.log(user);
+                    if(user) return next(new AppError("duplicate email",409));
                 }else{
 
                     req.body.image= req.file.filename;
@@ -95,8 +99,9 @@ export const getAll = (model,result) =>{
         // excute query
         let documents = await apiFeature.mongooseQuery;
         let response= {}
+        let count = documents.length
         response[result] = documents;
-        res.status(200).json({message:"Success",page:apiFeature.page, ...response});
+        res.status(200).json({message:"Success",page:apiFeature.page,count:count, ...response});
     })
 }
 

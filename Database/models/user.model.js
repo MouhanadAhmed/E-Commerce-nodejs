@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new Schema({
     name:{
-        type:string,
+        type:String,
         trim:true,
         required:[true,'name is required'],
         minlength: [1, 'too short user name'],
