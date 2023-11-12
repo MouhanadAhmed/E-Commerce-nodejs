@@ -3,28 +3,23 @@ import { deleteOne, addOne, getAll, updateOne, getById } from '../../utils/handl
 
 
 /**
- * *This is Add brand Controller, 
- * todo: Global error handeling
+ * This is Add brand Controller
  */
 export const addBrand = addOne(brandModel,"brand");
 /**
- * *This is Get All Brands Controller, 
- * todo: Global error handeling
+ * This is Get All Brands Controller
  */
 export const getAllBrands = getAll(brandModel,"brands");
 /**
- * *This is Update Brand Controller, 
- * todo: Global error handeling
+ * This is Update Brand Controller
  */
 export const updateBrand = updateOne(brandModel,"brand");
 /**
- * *This is Delete Brand Controller, 
- * todo: Global error handeling
+ * This is Delete Brand Controller
  */
 export const deleteBrand = deleteOne(brandModel,"brand");
 
 /**
- * *This is Get Category by Id Controller, 
- * todo: Global error handeling
+ * This is Get Category by Id Controller
  */
 export const getBrandById = getById(brandModel, 'brand');

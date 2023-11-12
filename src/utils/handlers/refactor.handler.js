@@ -5,7 +5,18 @@ import cloudinary from "../cloudinary.js";
 import ApiFeatures from "../APIFeatures.js";
 import bcrypt from 'bcrypt';
 import { sendEmail } from "../../email/sendEmail.js";
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
+
+
+
+
+
+/**
+ * This is Delete One document  handler
+ * - Accepts id from Req.params
+ *  @param model  The model to perform the operation on
+ *  @param result  The name to be displayed to the frontend as returned document
+ */
 export const deleteOne=(model,result)=>{
     return catchAsyncError(async (req,res,next) => {
         const {id}= req.params;
@@ -16,7 +27,13 @@ export const deleteOne=(model,result)=>{
         !document &&   next(new AppError("document not found",404))
     })
 }
-
+/**
+ * This is Add One document  handler
+ * - Accepts id from Req.params
+ *  TODO complete function documentation
+ *  @param model  The model to perform the operation on
+ *  @param result  The name to be displayed to the frontend as returned document
+ */
 export const addOne=(model,results) =>{
     return catchAsyncError(async (req,res,next) => {
   

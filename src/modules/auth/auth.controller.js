@@ -7,9 +7,19 @@ import AppError from '../../utils/services/AppError.js';
 import { sendEmail } from '../../email/sendEmail.js';
 
 
+/**
+ * This is Sign up User Controller
 
+ */
 export const signUp =addOne(userModel,"User");
 
+/**
+ * This is Sign in User Controller
+ * - Accepts email & password from Req.body
+ * - Updates isActive and removes LoggedOut
+ * - Generates Token
+ * 
+ */
 export const signIn = catchAsyncError(async (req,res,next) => {
     let {email, password} = req.body;
     let isFound = await userModel.findOne({email});
@@ -21,12 +31,17 @@ export const signIn = catchAsyncError(async (req,res,next) => {
         let loggedIn = await userModel.findByIdAndUpdate( isFound._id, {isActive:true,$unset:{loggedOutAt: 1}}, {new:true});
         console.log(loggedIn);
         let token = jwt.sign({name:isFound.name, userId:isFound._id, role:isFound.role},"treka");
-        sendEmail();
+        // sendEmail();
         return res.json({message:"Success",token})
     }
     next(new AppError("incorrect email or password",401))
 })
+/**
+ * This is log out User Controller   
+ * - Accepts token in the headers 
+ * - Updates isActive to false , LoggedOutAt to date
 
+ */
 export const logOut = catchAsyncError(async (req,res,next) => {
     let {token} = req.headers;
     if(!token) return next(new AppError("Please provide token",401));
@@ -36,11 +51,16 @@ export const logOut = catchAsyncError(async (req,res,next) => {
 
     let user = await userModel.findByIdAndUpdate(decoded.userId,{isActive:false,loggedOutAt:Date.now()}, {new:true} );
     if(!user) return next(new AppError("Invalid user",404));
-    user.isActive = false;
-    user.loggedOutAt = Date.now();
     return res.json({message:"Success",user})
 })
+/**
+ * This is Protected Routes  Controller
+ * Verifies user token for the following criteria :
+ * - Valid token
+ * - Token generated after last password change
+ * - Token's user is active
 
+ */
 export const protectedRoutes = catchAsyncError(async (req,res,next)=>{
     let {token} = req.headers;
     if(!token) return next(new AppError("Please provide token",401));
@@ -62,7 +82,11 @@ export const protectedRoutes = catchAsyncError(async (req,res,next)=>{
         req.user=user;
         next();
 })
-
+/**
+ * This is Allow to (Authorization)  Controller
+ * Verifies user role authorized to  use the endpoint
+* @param roles (Object) : containig allowed roles as strings
+ */
 export const allowTo= (...roles)=>{
 
     return catchAsyncError( (req,res,next)=>{
@@ -85,6 +109,12 @@ export const allowTo= (...roles)=>{
 //     user.reset
 // })
 
+/**
+ * This is Verify Email  Controller
+ * - Accepts token from the Req.params
+ * - Decodes id from the token
+ * - Updates verified to true
+ */
 export const verifyEmail =  (req,res,next)=>{
     let {token} = req.params;
     jwt.verify(token,process.env.VERIFY_SECRET,async(err,decoded)=>{

@@ -4,28 +4,23 @@ import { deleteOne, addOne, getAll, updateOne, getById } from '../../utils/handl
 
 /**
  * This is Add subCategory Controller, 
- * todo: Global error handeling
  */
 export const addSubCategory = addOne(subCategoryModel,'subCategory');
 /**
- * *This is Get All subCategory Controller, 
- * todo: Global error handeling
+ * This is Get All subCategory Controller
  */
 export const getAllSubCategories = getAll(subCategoryModel, 'SubCategories');
 /**
- * *This is Update subCategory Controller, 
- * todo: Global error handeling
+ * This is Update subCategory Controller
  */
 export const updateSubCategory = updateOne(subCategoryModel, 'subCategory')
 /**
- * *This is Delete subCategory Controller, 
- * todo: Global error handeling
+ * This is Delete subCategory Controller 
  */
 export const deleteSubCategory = deleteOne(subCategoryModel, 'subCategory');
 
 
 /**
- * *This is Get Category by Id Controller, 
- * todo: Global error handeling
+ * This is Get Category by Id Controller
  */
 export const getSubCategotryById = getById(subCategoryModel, 'subCategory');

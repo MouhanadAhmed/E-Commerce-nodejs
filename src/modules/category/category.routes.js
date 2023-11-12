@@ -8,6 +8,7 @@ import subCategoryRouter from '../subCategory/subCategory.routes.js';
 import { validation } from '../../utils/middleware/validation.js';
 import { createCategorySchema, deleteCategorySchema, getCategoryByIdSchema, updateCategorySchema } from './category.validator.js';
 
+// merge params in order to access the  subCategories  of a category by category id
 categoryRouter.use('/:id/subCategory',subCategoryRouter);
 
 categoryRouter.route('/')
