@@ -15,11 +15,7 @@ export default function init(app){
     app.use('/api/v1/product', productRouter);
     app.use('/api/v1/user', userRouter);
     app.use('/api/v1/auth', authRouter);
-    // app.use('/api/v1/verify',verifyEmail)
-    
-    
-    
-    // app.get('/', (req, res) => res.send('Hello World!'));
+
     app.all('*',(req,res,next)=>{
     next(new AppError(`can't find this route: ${req.originalUrl}`, 404))
 })

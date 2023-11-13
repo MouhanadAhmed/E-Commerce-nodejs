@@ -1,10 +1,11 @@
 /**
  * This is Global Error handler MiddleWare
- * @param {*} err the error from any controller or route
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- */
+ * ```
+ * - Display Error Stack in development mode only (Controlled by `process.env.MODE`)
+ * - Destructs Error message and the Error code (if no error code, 500 will be displayed)
+ * ```
+* @param {*} err The error from any controller or route
+*/
 
 
 export const globalError = (err,req,res,next)=>{

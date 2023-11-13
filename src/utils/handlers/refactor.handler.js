@@ -13,8 +13,10 @@ import jwt from 'jsonwebtoken';
 
 /**
  * This is Delete One document  handler
- * - Accepts id from Req.params
- *  @param model  The model to perform the operation on
+ * ```
+ *  Accepts id from Req.params
+* ``` 
+*  @param model  The model to perform the operation on
  *  @param result  The name to be displayed to the frontend as returned document
  */
 export const deleteOne=(model,result)=>{
@@ -29,29 +31,29 @@ export const deleteOne=(model,result)=>{
 }
 /**
  * This is Add One document  handler
+ * ```
  * - Accepts id from Req.params
- *  TODO complete function documentation
+ * - Verify user token to addd product 
+ * - Send Verification Email to the user
+ * ```
  *  @param model  The model to perform the operation on
  *  @param result  The name to be displayed to the frontend as returned document
  */
 export const addOne=(model,results) =>{
     return catchAsyncError(async (req,res,next) => {
   
-                // console.log(req.body,"req.body");
                 if (results === 'Product') {
                     req.body.imgCover = req.files.imgCover[0].filename;
                     req.body.images = req.files.images.map(ele => ele.filename)
                 }else if (results === "User"){
                     let user = await model.findOne({email:req.body.email});
                     console.log(user);
-                    // req.body.password = await bcrypt.hash(req.body.password,7)
                     if(user) return next(new AppError("Email already exists",409));
 
                 }else{
 
                     req.body.image= req.file.filename;
                 }
-                // console.log(req.body.image);
                 req.body.slug= slugify(req.body.name);
                 const document = new model(req.body);
                 await document.save();
@@ -63,33 +65,22 @@ export const addOne=(model,results) =>{
                 }
                 res.status(201).json({message:"Success", ...response});
 
-        // // req.body.image = req.file.filename
-        // req.body.slug= slugify(req.body.name);
-        // const document = new model(req.body);
-        // await document.save();
-        // let response= {}
-        // response[results] = document;
-        // res.status(201).json({message:"Success", ...response});
+
     })
 }
-
+/**
+ * This is Get all documents  handler
+ * ```
+ *API Features:
+ * - Accepts id from Req.params for category 
+ * - Pagination, Search, Sort, Fields & Filter 
+ * ```
+ *  @param model  The model to perform the operation on
+ *  @param result  The name to be displayed to the frontend as returned document
+ */
 export const getAll = (model,result) =>{
     return catchAsyncError(async (req,res,next) => {
-        // // pagination
-        // let page= req.query.page * 1 || 1;
-        // if(req.query.page <=0 ) page=1;
-        // let skip = (page -1) *4
 
-        // //filters
-        // let filterObj = {...req.query};
-        // let excludeQuery = ['page','sort','keyword','fields'];
-        // excludeQuery.forEach((q)=>{
-        //     delete filterObj[q];
-        // })
-        // filterObj=JSON.stringify(filterObj);
-        // filterObj= filterObj.replace(/\bgt|gte|lt|lte\b/g,match=> `$${match}`)
-        // filterObj=JSON.parse(filterObj);
-        //mergeParams
         let filters ={};
         if(req.params && req.params.id){
             filters = {
@@ -97,29 +88,7 @@ export const getAll = (model,result) =>{
             }
         }
         
-        // //sort
-        // //build query
-        // let mongooseQuery = model.find({...filters,...filterObj}).skip(skip).limit(4)
 
-        // if(req.query.sort){
-        //     let sortBy = req.query.sort.split(',').join(" ");
-        //     mongooseQuery.sort(sortBy)
-        // }
-        // // search
-        // if(req.query.keyword){
-        // mongooseQuery.find({
-        //     $or: [
-        //         {name       :{ $regex   : req.query.keyword , $options : "i"}},
-        //         {description :{ $regex   : req.query.keyword , $options : "i"}}
-        //     ]
-        // })
-        // }
-
-        // //fields
-        // if(req.query.fields){
-        //     let fields = req.query.fields.split(',').join(" ");
-        //     mongooseQuery.select(fields)
-        // }
         let apiFeature =   new ApiFeatures(model.find({...filters}), req.query).pagination().search().sort().fields().filter();
         // excute query
         let documents = await apiFeature.mongooseQuery;
@@ -129,7 +98,14 @@ export const getAll = (model,result) =>{
         res.status(200).json({message:"Success",page:apiFeature.page,count:count, ...response});
     })
 }
-
+/**
+ * This is Update One document  handler
+ * ```
+ * - Accepts id from Req.params  
+ * ```
+ *  @param model  The model to perform the operation on
+ *  @param result  The name to be displayed to the frontend as returned document
+ */
 export const updateOne = (model,result) => {
     return catchAsyncError(async (req,res,next) => {
         const {id}= req.params;
@@ -141,7 +117,14 @@ export const updateOne = (model,result) => {
         !document &&   next(new AppError(`Invalid ${result} Id`,404))
     })
 }
-
+/**
+ * This is Get One document by id handler
+ * ```
+ * - Accepts id from Req.params  
+ * ```
+ *  @param model  The model to perform the operation on
+ *  @param result  The name to be displayed to the frontend as returned document
+ */
 export const getById = (model,result) => {
     return catchAsyncError(async (req,res,next) => {
             const {id}= req.params;
