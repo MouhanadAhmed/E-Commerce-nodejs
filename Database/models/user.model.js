@@ -50,7 +50,9 @@ const userSchema = new Schema({
         type:Boolean,
         default:false
     },
-
+    ressetCode:{
+        type:String,
+    }
 
 },{
     timestamps:true

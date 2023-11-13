@@ -5,7 +5,7 @@ import { userModel } from '../../../Database/models/user.model.js';
 import { catchAsyncError } from '../../utils/middleware/catchAsyncError.js';
 import AppError from '../../utils/services/AppError.js';
 import { sendEmail } from '../../email/sendEmail.js';
-
+import otpGenerator  from 'otp-generator';
 
 /**
  * This is Sign up User Controller
@@ -26,12 +26,9 @@ export const signIn = catchAsyncError(async (req,res,next) => {
     const match = await bcrypt.compare(password,isFound.password);
     if(!isFound.verified) return next(new AppError("please verify your email first",401))
     if(isFound && match){
-        // isFound.isAtive=true;
-        // console.log(isFound);
         let loggedIn = await userModel.findByIdAndUpdate( isFound._id, {isActive:true,$unset:{loggedOutAt: 1}}, {new:true});
         console.log(loggedIn);
         let token = jwt.sign({name:isFound.name, userId:isFound._id, role:isFound.role},"treka");
-        // sendEmail();
         return res.json({message:"Success",token})
     }
     next(new AppError("incorrect email or password",401))
@@ -99,15 +96,23 @@ export const allowTo= (...roles)=>{
 
 
 }
-
-// export const forgotPassword = catchAsyncError(async (req,res,next) => {
-//     let {email} = req.body;
-//     let user = await userModel.findOne({email});
-//     if(!user) return next(new AppError("User with this email not found",404));
-
-//     let resetToken = jwt.sign({userId:user._id},"treka",{expiresIn:"1h"});
-//     user.reset
-// })
+/**
+ * This is forgotPassword  Controller
+ * - Accepts email  from Req.body
+ * - generates otp and send email to the user email 
+ * - Updates ressetCode with the otp
+ */
+export const forgotPassword = catchAsyncError(async (req,res,next) => {
+    let {email} = req.body;
+    let user = await userModel.findOne({email});
+    if(!user) return next(new AppError("User with this email not found",404));
+    const otp = otpGenerator.generate(6, {digits:false,  upperCaseAlphabets: false, specialChars: false });
+    let updatedUser= await userModel.findByIdAndUpdate(user._id,{ressetCode:otp})
+    if(updatedUser) {
+        sendEmail({email:req.body.email,api:``,sub:"Resset Code",text:`Submit this reset password code : ${otp} If you did not request a change of password, please ignore this email!`,title:"Resset password code"})
+        return res.json({message:"Success"});
+        }
+})
 
 /**
  * This is Verify Email  Controller
@@ -122,4 +127,9 @@ export const verifyEmail =  (req,res,next)=>{
       const updateUser =   await userModel.findByIdAndUpdate(decoded.id, {verified:true}, {new:true});
       res.json({message:"Success",updateUser});
     })
+}
+//TODO - Complete OTP verification
+export const verifyRessetCode = (req,res,next)=>{
+    let {otp} = req.body;
+
 }

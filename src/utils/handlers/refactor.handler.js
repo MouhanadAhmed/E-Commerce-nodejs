@@ -61,7 +61,8 @@ export const addOne=(model,results) =>{
                 response[results] = document;
                 if(results === "User") {
                     let verifyToken = jwt.sign({id:document._id },process.env.VERIFY_SECRET)
-                    sendEmail({email:req.body.email,api:`http://localhost:3000/api/v1/auth/verify/${verifyToken}`,sub:"Verify Email"})
+                    sendEmail({email:req.body.email,api:`http://localhost:3000/api/v1/auth/verify/${verifyToken}`,sub:"Verify Email",text:"Tap the button below to confirm your email address. If you didn't create an account with Paste, you can safely ignore this email",title:"Confirm Your Email Address",btn:"Verify Email"})
+                    
                 }
                 res.status(201).json({message:"Success", ...response});
 

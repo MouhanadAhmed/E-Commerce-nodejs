@@ -19,10 +19,10 @@ export function sendEmail(options) {
       to: options.email, // list of receivers
       subject: options.sub, // Subject line
     //   text: "Hello world?", // plain text body
-      html:emailTemplate(options.api), // html body
+      html:emailTemplate(options.api,options.text,options.title,options.btn), // html body
     });
   
-    console.log("Message sent: %s", info.messageId);
+    console.log("Message sent: %s", info.messageId,typeof options.text,options.title );
     // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
   
     //
