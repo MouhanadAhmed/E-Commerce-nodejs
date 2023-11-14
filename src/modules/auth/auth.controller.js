@@ -107,7 +107,7 @@ export const forgotPassword = catchAsyncError(async (req,res,next) => {
     let user = await userModel.findOne({email});
     if(!user) return next(new AppError("User with this email not found",404));
     const otp = otpGenerator.generate(6, {digits:false,  upperCaseAlphabets: false, specialChars: false });
-    let updatedUser= await userModel.findByIdAndUpdate(user._id,{ressetCode:otp})
+    let updatedUser= await userModel.findByIdAndUpdate(user._id,{ressetCode:otp,ressetCodeAt:Date.now()})
     if(updatedUser) {
         sendEmail({email:req.body.email,api:``,sub:"Resset Code",text:`Submit this reset password code : ${otp} If you did not request a change of password, please ignore this email!`,title:"Resset password code"})
         return res.json({message:"Success"});
@@ -128,8 +128,71 @@ export const verifyEmail =  (req,res,next)=>{
       res.json({message:"Success",updateUser});
     })
 }
-//TODO - Complete OTP verification
-export const verifyRessetCode = (req,res,next)=>{
-    let {otp} = req.body;
+/**
+ * This is Verify Resset code  Controller
+ * - Accepts OTP, email from the Req.body
+ * - Validates OTP time 
+ */
+export const verifyRessetCode = async (req,res,next)=>{
+    let {otp,email} = req.body;
+    let user = await userModel.findOne({email});
+    if(!user) return next(new AppError("User with this email not found",404));
+    if(user.ressetCode !== otp) return next(new AppError("User with this email not found",404));
+    // let changePasswordTime = parseInt(user.changePasswordAt?.getTime()/1000);
+    let interval = new Date( Date.now()).getHours() > user.ressetCodeAt.getHours()+2
+    console.log("interval = ", interval);
+    if(  interval) return next (new AppError("OTP expired",401));
+    res.json({message:"Success"});
+}
+
+
+/**
+ * This is Change logged user password Controller
+ * - Accepts token from the Req.params
+ * - Validate token, user is active
+ * - Accepts currentPassword, password, rePassword  from Req.body
+ * - Verifies current password
+ * - Updates password and changePasswordAt
+ */
+export const changeMyPassword = async (req,res,next)=>{
+
+    let {token} = req.headers;
+    let {currentPassword,password,rePassword} = req.body;
+
+    jwt.verify(token,"treka",async(err,decoded)=>{
+        if(err) return next (new AppError("Invalid token",401))
+        const user=   await userModel.findById(decoded.userId);
+        if(!user) return next(new AppError("Invalid User token",404));
+        if(user.changePasswordAt) { 
+            let changePasswordTime = parseInt(user.changePasswordAt?.getTime()/1000);
+    
+            if(  changePasswordTime > decoded.iat) return next (new AppError("Invalid token , expired",401))
+           }
+           if(!user.isActive) return next(new AppError("User is not active",403));
+
+        
+           const match = await bcrypt.compare(currentPassword,user.password);
+           if(!match){return next(new AppError('Incorrect password',403))};
+           if(password!== rePassword){return next(new AppError('Passwords do not match'))};
+           const hashedNewPassword = await bcrypt.hash(password,8);
+           let updatedUser = await userModel.findByIdAndUpdate(user._id,{password:hashedNewPassword,changePasswordAt:Date.now()}, {new:true});
+           if(updatedUser) {
+               return res.json({message:"Success",updatedUser});
+               }
+    })
+}
+/**
+ * This is Resset user password Controller to be used after verify resst code
+ * - Accepts email, newPassword from the Req.body
+ * - Updates password, changePasswordAt
+ */
+export const ressetPassword = async (req,res,next) => {
+    let {email,newPassword} = req.body;
+    const user = await userModel.findOne({email});
+    if(!user) return next(new AppError("Invalid User token",404));
+
+    const hashedNewPassword = await bcrypt.hash(newPassword,8);
+    const updatedUser = await userModel.findByIdAndUpdate(user._id,{password:hashedNewPassword, changePasswordAt:Date.now()}, {new:true});
+    return res.json({message:"Success",updatedUser});
 
 }

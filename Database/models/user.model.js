@@ -52,7 +52,8 @@ const userSchema = new Schema({
     },
     ressetCode:{
         type:String,
-    }
+    },
+    ressetCodeAt:Date
 
 },{
     timestamps:true
