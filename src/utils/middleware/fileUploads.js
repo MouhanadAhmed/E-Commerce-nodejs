@@ -1,6 +1,7 @@
 
 import multer from "multer";
 import AppError from "../services/AppError.js"
+import fs from 'fs';
 /**
  * This is Options for the multer file upload
  * ```

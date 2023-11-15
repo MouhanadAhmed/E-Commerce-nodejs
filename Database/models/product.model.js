@@ -81,12 +81,12 @@ productSchema.post("init", (doc) => {
     if (doc.images) doc.images = doc.images.map((path) => process.env.BASE_URL + "product/" + path);
   }); 
   
-//   productSchema.virtual("myReview", {
-//     ref: "review",
-//     localField: "_id",
-//     foreignField: "product"
-//   });
-//   productSchema.pre(/^find/, function () {
-//     this.populate("myReview");
-// })
+  productSchema.virtual('reviews', {
+    ref:'review',
+    localField:'_id',
+    foreignField:'product'
+  });
+  productSchema.pre(/^find/, function () {
+    this.populate('reviews');
+})
 export const productModel = model('product',productSchema)

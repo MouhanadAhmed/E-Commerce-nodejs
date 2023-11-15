@@ -6,6 +6,8 @@ import brandRouter from "./modules/brand/brand.routes.js";
 import productRouter from "./modules/product/product.routes.js";
 import userRouter from "./modules/user/user.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
+import reviewRouter from "./modules/review/review.routes.js";
+import wishListRouter from "./modules/wishlist/wishlist.routes.js";
 
 export default function init(app){
 
@@ -15,7 +17,9 @@ export default function init(app){
     app.use('/api/v1/product', productRouter);
     app.use('/api/v1/user', userRouter);
     app.use('/api/v1/auth', authRouter);
-
+    app.use('/api/v1/review',reviewRouter);
+    app.use('/api/v1/wishlist',wishListRouter);
+    
     app.all('*',(req,res,next)=>{
     next(new AppError(`can't find this route: ${req.originalUrl}`, 404))
 })

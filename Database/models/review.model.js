@@ -9,7 +9,8 @@ const reviewSchema = new Schema({
     },
     product: {
         type:Types.ObjectId,
-        ref: "product"
+        ref: "product",
+        required: [true, 'reviewed product id required']
     },
     user: {
         type: Types.ObjectId,
@@ -22,11 +23,14 @@ const reviewSchema = new Schema({
         max:5
     }
 },{
-    timestamps:true
+    timestamps:true,
+    // toJSON: { virtuals: true }, 
+    // toObject: { virtuals: true }
 })
 
-reviewSchema.pre(/^find/, function () {
-    this.populate('user','name');
-})
+// reviewSchema.pre(/^find/, function () {
+//     this.populate('user','name');
+//     this.populate('product','name');
+// })
 
 export const reviewModel = model('review',reviewSchema)

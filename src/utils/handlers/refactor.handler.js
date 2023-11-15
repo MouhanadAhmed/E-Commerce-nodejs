@@ -6,6 +6,7 @@ import ApiFeatures from "../APIFeatures.js";
 import bcrypt from 'bcrypt';
 import { sendEmail } from "../../email/sendEmail.js";
 import jwt from 'jsonwebtoken';
+import { reviewModel } from "../../../Database/models/review.model.js";
 
 
 
@@ -22,6 +23,23 @@ import jwt from 'jsonwebtoken';
 export const deleteOne=(model,result)=>{
     return catchAsyncError(async (req,res,next) => {
         const {id}= req.params;
+        if(result ==="review") {
+            // check for reviewed product existance
+            let reviewed = await reviewModel.findOne({user:req.user._id,product:req.body.product})
+            if(!reviewed) return next(new AppError("Unauthorized",409))
+            req.body.user=req.user._id
+        }else if (result ==="wishlist"){
+            const{product} =req.body;
+                    let document = await model.findByIdAndUpdate(req.user._id,{
+                        $pull:{
+                            wishList:product
+                        }
+                    },{new:true})
+        let response= {}
+        response[result] = document;
+        document && res.status(200).json({message:"Success", ...response});
+        !document &&   next(new AppError(`Invalid ${result} Id`,404))
+        }
         let document = await model.findByIdAndDelete(id);
         let response= {}
         response[result] = document;
@@ -50,11 +68,15 @@ export const addOne=(model,results) =>{
                     console.log(user);
                     if(user) return next(new AppError("Email already exists",409));
 
-                }else{
-
-                    req.body.image= req.file.filename;
+                }else if(results ==="review") {
+                    // check for reviewed product existance
+                    let reviewed = await reviewModel.findOne({user:req.user._id,product:req.body.product})
+                    if(reviewed) return next(new AppError("Review already exists on the product",409))
+                    req.body.user=req.user._id
                 }
-                req.body.slug= slugify(req.body.name);
+
+                req.file?.filename ?   req.body.image= req?.file?.filename:"";
+                req.body.name ?   req.body.slug = slugify(req.body.name):"";
                 const document = new model(req.body);
                 await document.save();
                 let response= {}
@@ -109,7 +131,24 @@ export const getAll = (model,result) =>{
  */
 export const updateOne = (model,result) => {
     return catchAsyncError(async (req,res,next) => {
-        const {id}= req.params;
+        let {id}= req.params;
+        if(result ==="review") {
+            // check for reviewed product existance
+            let reviewed = await reviewModel.findOne({id,user:req.user._id,product:req.body.product})
+            if(!reviewed) return next(new AppError("Unauthorized",409))
+            req.body.user=req.user._id
+        }else if (result ==="wishlist"){
+            const{product} =req.body;
+                    let document = await model.findByIdAndUpdate(req.user._id,{
+                        $addToSet:{
+                            wishList:product
+                        }
+                    },{new:true})
+        let response= {}
+        response[result] = document;
+        document && res.status(200).json({message:"Success", ...response});
+        !document &&   next(new AppError(`Invalid ${result} Id`,404))
+        }
         if(req.body.name) req.body.slug= slugify(req.body.name);
         let document = await model.findByIdAndUpdate(id,req.body,{new:true})
         let response= {}
