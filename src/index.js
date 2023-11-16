@@ -8,6 +8,8 @@ import userRouter from "./modules/user/user.routes.js";
 import authRouter from "./modules/auth/auth.routes.js";
 import reviewRouter from "./modules/review/review.routes.js";
 import wishListRouter from "./modules/wishlist/wishlist.routes.js";
+import addressRouter from "./modules/address/address.routes.js";
+import couponRouter from "./modules/coupon/coupon.routes.js";
 
 export default function init(app){
 
@@ -19,6 +21,8 @@ export default function init(app){
     app.use('/api/v1/auth', authRouter);
     app.use('/api/v1/review',reviewRouter);
     app.use('/api/v1/wishlist',wishListRouter);
+    app.use('/api/v1/address',addressRouter);
+    app.use('/api/v1/coupon',couponRouter);
     
     app.all('*',(req,res,next)=>{
     next(new AppError(`can't find this route: ${req.originalUrl}`, 404))

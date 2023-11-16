@@ -2,9 +2,10 @@ import Joi from "joi";
 
 /**
  * This is Create User validation Schema - validates the following fields :
- * - name (String) : minimum 2 chars, maximum 30 chars -> required
- * - email (String) : minDomainSegments 2 chars, allow  com,net domains -> required
- * - phone (String) : length 11 numbers -> required
+ * - name (String) : minimum 2 chars, maximum 30 chars     ---------------------> required
+ * - email (String) : minDomainSegments 2 chars, allow  com,net domains      ---> required
+ * - password (String) : minimum 5 chars, maximum 30 chars      ----------------> required
+ * - phone (String) : length 11 numbers ----------------------------------------> required
  * - role (String) : accepts user or admin 
  * 
  */

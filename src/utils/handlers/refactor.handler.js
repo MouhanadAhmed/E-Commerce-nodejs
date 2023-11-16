@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import { sendEmail } from "../../email/sendEmail.js";
 import jwt from 'jsonwebtoken';
 import { reviewModel } from "../../../Database/models/review.model.js";
+import  QRCode  from "qrcode";
 
 
 
@@ -39,6 +40,19 @@ export const deleteOne=(model,result)=>{
         response[result] = document;
         document && res.status(200).json({message:"Success", ...response});
         !document &&   next(new AppError(`Invalid ${result} Id`,404))
+        } else if (result === "address"){
+            const{id:_id} =req.body;
+            let addresses = await model.findById(req.user._id);
+            let document = await model.findByIdAndUpdate(req.user._id,{
+                $pull:{
+                    address:{_id}
+                }
+            },{new:true})
+            let response= {}
+            response[result] = document;
+            if(addresses.address.length === document.address.length) return next(new AppError(`Invalid address Id`,404));
+            document && res.status(200).json({message:"Success", ...response});
+            !document &&   next(new AppError(`Invalid user Id`,404))
         }
         let document = await model.findByIdAndDelete(id);
         let response= {}
@@ -147,7 +161,18 @@ export const updateOne = (model,result) => {
         let response= {}
         response[result] = document;
         document && res.status(200).json({message:"Success", ...response});
-        !document &&   next(new AppError(`Invalid ${result} Id`,404))
+        !document &&   next(new AppError(`Invalid user Id`,404))
+        } else if (result === "address"){
+                    const{city,street,phone} =req.body;
+                    let document = await model.findByIdAndUpdate(req.user._id,{
+                        $addToSet:{
+                            address:{city,street,phone}
+                        }
+                    },{new:true})
+        let response= {}
+        response[result] = document;
+        document && res.status(200).json({message:"Success", ...response});
+        !document &&   next(new AppError(`Invalid user Id`,404))
         }
         if(req.body.name) req.body.slug= slugify(req.body.name);
         let document = await model.findByIdAndUpdate(id,req.body,{new:true})
@@ -168,7 +193,23 @@ export const updateOne = (model,result) => {
 export const getById = (model,result) => {
     return catchAsyncError(async (req,res,next) => {
             const {id}= req.params;
+            if(result === "address") {
+                const userId = req.user._id;
+                const user = await model.findById(userId);
+                const address= user.address.filter((item) => item._id ==id);
+                !user &&   next(new AppError(`Invalid user Id`,404));
+               if (address.length===0) return  next(new AppError(`Invalid address Id`,404));
+                res.status(200).json({message:`Success`,address:address[0] });
+                
+
+            }
             let document = await model.findById(id);
+            if(result === 'coupon') {
+             let URL = await   QRCode.toDataURL(document.code);
+              let response= {}
+              response[result] = document;
+              document && res.status(200).json({message:"Success",...response,url:URL});
+            }
             let response= {}
             response[result] = document;
             document && res.status(200).json({message:"Success",...response});

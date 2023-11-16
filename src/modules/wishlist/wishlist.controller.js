@@ -1,5 +1,5 @@
 import { userModel } from '../../../Database/models/user.model.js';
-import { deleteOne, addOne, getAll, updateOne } from '../../utils/handlers/refactor.handler.js';
+import { deleteOne, updateOne } from '../../utils/handlers/refactor.handler.js';
 import { catchAsyncError } from '../../utils/middleware/catchAsyncError.js';
 
 
